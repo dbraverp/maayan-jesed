@@ -462,6 +462,24 @@ body.tv #tvroot{display:block}
 @media (max-width:380px){.rolebtn .rl{display:none}}
 .bagrow.approved{background:color-mix(in srgb,var(--water) 14%,var(--surface));border-color:color-mix(in srgb,var(--water) 45%,var(--line))}.bagrow.fix{border-color:var(--warn)}.bagpts{font-style:normal;font-weight:900;color:var(--primary);white-space:nowrap}
 .bagtot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:14px 16px;border-radius:16px;background:var(--ink);color:var(--surface);font-weight:900}.bagtot b{display:flex;align-items:center;gap:6px;font-size:20px}
+.sheet{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.sheet-bg{overscroll-behavior:contain}
+#deckhint{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:4px}
+.sg-t{font-size:12px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.swguide{display:flex;align-items:center;gap:10px;justify-content:center}
+.sg-l,.sg-r{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;font-weight:900;font-size:15px;border:2.5px solid}
+.sg-l{color:var(--bad,#C0392B);border-color:var(--bad,#C0392B);background:color-mix(in srgb,var(--bad,#C0392B) 10%,var(--surface))}
+.sg-r{color:var(--primary);border-color:var(--primary);background:color-mix(in srgb,var(--primary) 10%,var(--surface))}
+.sg-ar{font-size:18px;line-height:1;letter-spacing:-2px}
+.sg-l .sg-ar{animation:sgl 1.4s ease-in-out infinite}.sg-r .sg-ar{animation:sgr 1.4s ease-in-out infinite}
+.sg-hand{font-size:26px;display:inline-block;animation:sghand 2.8s ease-in-out infinite}
+@keyframes sgl{0%,100%{transform:translateX(0)}50%{transform:translateX(-5px)}}
+@keyframes sgr{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+@keyframes sghand{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-16px) rotate(-14deg)}75%{transform:translateX(16px) rotate(14deg)}}
+.sg-x{font-size:13px;font-weight:800;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.sg-ar,.sg-hand{animation:none}}
+html.locked,html.locked body{overflow:hidden;overscroll-behavior:none}
+.sheet-bg{height:100dvh;touch-action:none}.sheet{touch-action:pan-y;max-height:min(88vh,88dvh)}
+@media (max-width:899px){.sheet{max-height:min(92vh,92dvh)}}
 </style>
 
 </head>
@@ -827,7 +845,8 @@ function renderDeck(first){const deck=document.getElementById('deck'),Q=queue().
  document.getElementById('deckbtns').innerHTML=S.role==='maestro'?`<div class="rb"><button class="round" data-act="no" aria-label="No me consta">${ic('x',30,'var(--bad)',3)}</button><span>No me consta</span></div><div class="rb"><button class="round yes" data-act="yes" aria-label="Lo vi">${ic('check',40,'var(--on-primary)',3.2)}</button><span>Lo vi</span></div>`:isAdmin()
   ?`<div class="rb"><button class="round" data-act="no" aria-label="Regresar al alumno con un comentario">${ic('undo',30,'var(--bad)',2.8)}</button><span>Regresar</span></div><div class="rb"><button class="round yes" data-act="yes" aria-label="Aprobar">${ic('check',40,'var(--on-primary)',3.2)}</button><span>Aprobar</span></div><div class="rb"><button class="round info" data-act="adjust" aria-label="Ajustar gotas y comentar">${ic('chat',22)}</button><span>Comentar</span></div>`
   :`<div class="rb"><button class="round" data-act="no" aria-label="Ver otra idea">${ic('x',30,'var(--bad)',3)}</button><span>Otra idea</span></div><div class="rb"><button class="round yes" data-act="yes" aria-label="¡Lo hago! Guardar en mi bolsa">${ic('check',40,'var(--on-primary)',3.2)}</button><span>¡Lo hago!</span></div>`;
- document.getElementById('deckhint').textContent=S.role==='maestro'?`O arrastra la tarjeta: ← no me consta · lo vi → · ${queue().length} por confirmar`:isAdmin()?`O arrastra la tarjeta: ← regresar · aprobar → · ${queue().length} pendientes`:'O arrastra la tarjeta: ← otra idea · ¡lo hago! →';
+ {const [L,R,extra]=S.role==='maestro'?['No me consta','Lo vi',`${queue().length} por confirmar`]:isAdmin()?['Regresar','Aprobar',`${queue().length} pendientes`]:['Otra idea','¡Lo hago!',''];
+ document.getElementById('deckhint').innerHTML=`<span class="sg-t">Desliza la tarjeta</span><div class="swguide" aria-hidden="true"><span class="sg-l"><b class="sg-ar">‹‹</b>${L}</span><span class="sg-hand">👆</span><span class="sg-r">${R}<b class="sg-ar">››</b></span></div>${extra?`<span class="sg-x">${extra}</span>`:''}`;document.getElementById('deckhint').setAttribute('aria-label',`Desliza la tarjeta: a la izquierda ${L}, a la derecha ${R}`)}
  bindDrag();swipeDemo()}
 let demoDone=false;function swipeDemo(){if(demoDone)return;const el=document.getElementById('front');if(!el)return;demoDone=true;const h=document.createElement('span');h.className='swhand';h.setAttribute('aria-hidden','true');h.textContent='👆';el.appendChild(h);el.classList.add('swdemo');setTimeout(()=>{el.classList.remove('swdemo');h.remove()},2600)}
 
@@ -891,6 +910,11 @@ function renderAll(first){if(!S.logged){renderLogin();return}const st=S.role==='
 /* ---------- Hojas ---------- */
 function sheet(html){document.getElementById('layer').innerHTML=`<div class="sheet-bg" data-act="bgclose"><div class="sheet" role="dialog" aria-modal="true"><button class="x" data-act="close" aria-label="Cerrar">${ic('x',20)}</button>${html}</div></div>`;const f=document.querySelector('.sheet input:not([type=checkbox]),.sheet textarea');f&&f.focus()}
 function closeSheet(){document.getElementById('layer').innerHTML=''}
+/* bloquea el scroll de atrás mientras hay una ventana abierta */
+let lockY=null;function lockScroll(on){const b=document.body,h=document.documentElement;if(on&&lockY===null){lockY=scrollY;h.classList.add('locked');Object.assign(b.style,{position:'fixed',top:(-lockY)+'px',left:'0',right:'0',width:'100%',overflow:'hidden'})}else if(!on&&lockY!==null){h.classList.remove('locked');Object.assign(b.style,{position:'',top:'',left:'',right:'',width:'',overflow:''});scrollTo(0,lockY);lockY=null}}
+new MutationObserver(()=>lockScroll(!!document.querySelector('#layer .sheet-bg'))).observe(document.getElementById('layer'),{childList:true});
+{let ty=0;const L=document.getElementById('layer');L.addEventListener('touchstart',e=>{ty=e.touches[0].clientY},{passive:true});
+ L.addEventListener('touchmove',e=>{const sh=e.target.closest('.sheet');if(!sh){e.preventDefault();return}const dy=e.touches[0].clientY-ty,top=sh.scrollTop<=0,bot=sh.scrollTop+sh.clientHeight>=sh.scrollHeight-1;if(sh.scrollHeight<=sh.clientHeight||(top&&dy>0)||(bot&&dy<0))e.preventDefault()},{passive:false})}
 let tt;function toast(t){document.querySelectorAll('.toast').forEach(e=>e.remove());const el=document.createElement('div');el.className='toast';el.setAttribute('role','status');el.textContent=t;document.body.appendChild(el);clearTimeout(tt);tt=setTimeout(()=>el.remove(),3200)}
 function dropFx(pts){const el=document.createElement('div');el.className='fx';el.innerHTML=`<span class="d">${drop(48,'var(--water)')}</span><span class="ring"></span><span class="ring r2"></span><b>+${pts} ${(pts)===1?'gota':'gotas'}</b>`;document.body.appendChild(el);setTimeout(()=>el.remove(),2000)}
 function confetti(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const c=document.createElement('canvas');c.className='confetti';c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);const x=c.getContext('2d'),cols=['#FFC93C','#FF6B4A','#3DA5FF','#2EC4B6','#A77BFF'];const ps=[...Array(120)].map(()=>({x:innerWidth/2,y:innerHeight*.4,vx:(Math.random()-.5)*15,vy:Math.random()*-14-4,s:6+Math.random()*6,r:Math.random()*6,c:cols[Math.floor(Math.random()*5)]}));let t=0;(function f(){x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;p.r+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/3,p.s,p.s*.66);x.restore()});if(++t<115)requestAnimationFrame(f);else c.remove()})()}
