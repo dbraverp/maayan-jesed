@@ -478,8 +478,8 @@ body.tv #tvroot{display:block}
 .sg-x{font-size:13px;font-weight:800;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.sg-ar,.sg-hand{animation:none}}
 html.locked,html.locked body{overflow:hidden;overscroll-behavior:none}
-.sheet-bg{height:100dvh;touch-action:none}.sheet{touch-action:pan-y;max-height:min(88vh,88dvh)}
-@media (max-width:899px){.sheet{max-height:min(92vh,92dvh)}}
+.sheet{touch-action:pan-y;overflow-y:auto;max-height:min(88vh,88svh)}
+@media (max-width:899px){.sheet{max-height:calc(100svh - 64px);padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}}
 .rb>span.lbl-no{color:var(--bad,#C0392B)}.rb>span.lbl-yes{color:var(--primary)}.rb .sg-ar{font-size:15px}.lbl-no .sg-ar{display:inline-block;animation:sgl 1.4s ease-in-out infinite}.lbl-yes .sg-ar{display:inline-block;animation:sgr 1.4s ease-in-out infinite}
 .sg-hand.mid{align-self:center;margin-top:-26px;font-size:28px}
 </style>
