@@ -538,7 +538,7 @@ input,select,textarea,.in{font-size:16px!important}
 <script>
 'use strict';
 /* ---------- Datos de ejemplo ---------- */
-const KEY='maayan-jesed-proto-v9';
+const KEY='maayan-jesed-proto-v10';
 const SECS=['Kinder','Primaria','Secundaria','Prepa'];
 const SEC={Kinder:'Kínder',Primaria:'Primaria',Secundaria:'Secundaria',Prepa:'Prepa'};
 const SEC_C={Kinder:'var(--sun)',Primaria:'var(--coral)',Secundaria:'var(--mint)',Prepa:'var(--lilac)'};
@@ -765,11 +765,12 @@ const DEF={v:5,cur:null,
  accounts:[
   {id:'a1',role:'alumno',name:'Ana',email:'ana@olamiort.edu.mx',sec:'Primaria',grp:'4.º B'},
   {id:'a2',role:'alumno',name:'Leo',email:'leo@olamiort.edu.mx',sec:'Prepa',grp:'5.º A'},
+  {id:'a3',role:'alumno',name:'Sofía',email:'sofia@olamiort.edu.mx',sec:'Primaria',grp:'4.º B'},
   {id:'f1',role:'familia',name:'Mamá de Ana',email:'familia.ana@correo.mx',child:'a1'},
   {id:'m1',role:'maestro',name:'Maestra Laura',email:'laura@olamiort.edu.mx',sec:'Primaria',grp:'4.º B',status:'approved'},
   {id:'m2',role:'maestro',name:'Maestro David',email:'david@olamiort.edu.mx',sec:'Prepa',grp:'5.º A',status:'approved'},
   {id:'c1',role:'admin',name:'Coordinación',email:'coordinacion@olamiort.edu.mx'}],
- studs:{a1:NEWSTUD(),a2:NEWSTUD()},invites:[{code:'MJ-2C-4821',sec:'Secundaria',grp:'2.º C',used:null,at:0}],custom:[],avisos:[],log:[],featured:[],remind:[],proposals:[],requests:[],simDate:'',
+ studs:{a1:NEWSTUD(),a2:NEWSTUD(),a3:NEWSTUD()},invites:[{code:'MJ-2C-4821',sec:'Secundaria',grp:'2.º C',used:null,at:0}],custom:[],avisos:[],log:[],featured:[],remind:[],proposals:[],requests:[],simDate:'',
  settings:{alumnosGen:80,generaciones:15,retosMes:5,mesesCiclo:10,premio:'una mañana de juegos para todo el salón (ejemplo)',metaSalon:300,metaHoras:120,top:{Kinder:false,Primaria:true,Secundaria:true,Prepa:true},kinderAuto:true}};
 
 /* ---------- Modo presentación: estado limpio con tarjetas de ejemplo ---------- */
@@ -779,17 +780,15 @@ function presentationState(){const st=JSON.parse(JSON.stringify(DEF));st.v=5;st.
  const sub=(owner,sec,r,text,status,hAgo,val)=>({id:'demo-'+owner+'-'+r.id,owner,rid:r.id,title:r.t,text,cat:r.cat,sec,anon:false,status,pts:r.pts,at:now-hAgo*H,photo:null,show:false,comment:'',...(val?{val}:{})});
  const a=st.studs.a1,l=st.studs.a2;
  a.subs=[
-  sub('a1','Primaria',pick('Primaria','alta','colegio',0),'Le escribí una nota de agradecimiento al conserje por mantener limpio el patio y se la entregué en la entrada.','pending',5,{by:'maestro',ok:true,at:now-2*H,name:'Maestra Laura'}),
-  sub('a1','Primaria',pick('Primaria','alta','colegio',1),'Al terminar el recreo recogí mi basura y tres envolturas más que estaban junto a la cancha.','pending',3),
-  sub('a1','Primaria',pick('Primaria','alta','colegio',2),'Le expliqué a un compañero las tablas de multiplicar que no entendía mientras esperábamos la clase de inglés.','pending',1),
   sub('a1','Primaria',pick('Primaria','alta','casa',0),'Tendí mi cama y ordené mi cuarto en la mañana sin que nadie me lo recordara.','pending',20),
   sub('a1','Primaria',pick('Primaria','alta','casa',1),'Escribí con mi familia una lista de cinco cosas por las que estamos agradecidos esta semana y la pegamos en el refri.','pending',26),
   sub('a1','Primaria',pick('Primaria','alta','rapido',0),'Saludé por su nombre al señor de la entrada y le pregunté cómo estaba.','approved',30)];
+ st.studs.a3.subs=[
+  sub('a3','Primaria',pick('Primaria','alta','colegio',0),'Le escribí una nota de agradecimiento al conserje por mantener limpio el patio y se la entregué en la entrada.','pending',5),
+  sub('a3','Primaria',pick('Primaria','alta','colegio',1),'Al terminar el recreo recogí mi basura y tres envolturas más que estaban junto a la cancha.','pending',3)];
  l.subs=[
   sub('a2','Prepa',pick('Prepa',null,'colegio',0),'Acompañé a un alumno de primero de secundaria en el recreo y le ayudé con su tarea de matemáticas.','pending',4),
-  sub('a2','Prepa',pick('Prepa',null,'colegio',2),'Organicé con mi grupo una colecta de útiles escolares; juntamos dos cajas para una casa hogar.','pending',2),
-  sub('a2','Prepa',pick('Prepa',null,'colegio',1),'Di una asesoría de lectura a niños de tercero de primaria durante la hora libre.','pending',6,{by:'maestro',ok:true,at:now-1*H,name:'Maestro David'}),
-  sub('a2','Prepa',pick('Prepa',null,'rapido',0),'Le di las gracias a mi maestra de química por quedarse a resolver dudas después de clase.','pending',2)];
+  sub('a2','Prepa',pick('Prepa',null,'colegio',2),'Organicé con mi grupo una colecta de útiles escolares; juntamos dos cajas para una casa hogar.','pending',2)];
  l.hours=[{id:'h-demo-1',org:'Banco de alimentos',date:new Date(now-3*24*H).toISOString().slice(0,10),hrs:4,act:'Clasifiqué y empaqué despensas para familias de la comunidad.',resp:'Coordinadora del banco de alimentos',status:'pending',at:now-48*H}];
  return st}
 function resetPresentation(){try{localStorage.setItem(KEY,JSON.stringify(presentationState()));sessionStorage.removeItem('mj-sesion')}catch(e){}}
