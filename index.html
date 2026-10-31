@@ -15,7 +15,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap">
 <style>
-html,body{overflow-x:clip;max-width:100%}@supports not (overflow:clip){html,body{overflow-x:hidden}}
 
 /* Layout: una sola pantalla sin pestañas. Arriba: tu gota. Centro: baraja de retos que se desliza. Abajo: el manantial (agua fija) con tu bolsa de retos y el botón "Sumar mi gota". */
 :root{
@@ -443,11 +442,31 @@ body.tv #tvroot{display:block}
 @keyframes enter{from{transform:translateY(30px) scale(.9);opacity:0}to{transform:none;opacity:1}}
 .dcard.front.new{animation:enter .4s cubic-bezier(.2,1.2,.4,1) both}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* manantial al final de la página, no fijo */
+.app{padding-bottom:30px!important;overflow-x:clip}
+.spring{position:relative!important;left:auto;right:auto;bottom:auto;z-index:1;pointer-events:auto;margin-top:24px}
+.spring .water{top:0;bottom:0;height:auto!important}
+.spring .inner{padding-top:40px;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+.sp-close,.minibag{display:none!important}
+.spring{overflow:hidden}
+.brandbar{min-width:0;max-width:100vw;box-sizing:border-box}.brandbar>*{min-width:0}.bb-r{flex:none}
+@media (max-width:420px){.brandbar{gap:6px;font-size:18px}.bb-r{gap:6px}.rolebtn{padding:0 8px;gap:4px}}
+
+.bagbtn{border-color:var(--ink)}.bagbtn i{background:var(--primary);color:var(--on-primary,#fff)}
+.bagbtn.bump{animation:bump .6s cubic-bezier(.2,1.6,.4,1)}
+.bagrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:12px 14px;cursor:pointer;color:var(--ink);font:inherit;margin-top:8px}
+.bagrow span{flex:1;min-width:0;display:flex;flex-direction:column}.bagrow b{font-size:16px}.bagrow small{font-weight:900;font-size:13px}
+@media (max-width:420px){.bell{width:40px;height:40px}.rolebtn{font-size:13px}}
+@media (max-width:420px){.brandbar>span:not(.bb-r){font-size:17px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.brandbar small{font-size:9px;letter-spacing:1px}.brandbar>svg{width:30px;height:30px}}
+@media (max-width:380px){.rolebtn .rl{display:none}}
+.bagrow.approved{background:color-mix(in srgb,var(--water) 14%,var(--surface));border-color:color-mix(in srgb,var(--water) 45%,var(--line))}.bagrow.fix{border-color:var(--warn)}.bagpts{font-style:normal;font-weight:900;color:var(--primary);white-space:nowrap}
+.bagtot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:14px 16px;border-radius:16px;background:var(--ink);color:var(--surface);font-weight:900}.bagtot b{display:flex;align-items:center;gap:6px;font-size:20px}
 </style>
 
 </head>
 <body>
-<header class="brandbar"><svg width="40" height="40" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6C50 6 18 44 18 64a32 32 0 0 0 64 0C82 44 50 6 50 6Z" fill="var(--primary)"></path><path d="M50 84C37 75 31 67 31 60a9.5 9.5 0 0 1 19-3.5A9.5 9.5 0 0 1 69 60c0 7-6 15-19 24Z" fill="var(--sun)"></path></svg><span><small>COLEGIO OLAMI ORT</small>maayan jésed</span><span class="bb-r"><button class="bell" id="bell" data-act="notifs" aria-label="Notificaciones"></button><button class="rolebtn" id="rolebtn" data-act="roles"></button></span></header>
+<header class="brandbar"><svg width="40" height="40" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6C50 6 18 44 18 64a32 32 0 0 0 64 0C82 44 50 6 50 6Z" fill="var(--primary)"></path><path d="M50 84C37 75 31 67 31 60a9.5 9.5 0 0 1 19-3.5A9.5 9.5 0 0 1 69 60c0 7-6 15-19 24Z" fill="var(--sun)"></path></svg><span><small>COLEGIO OLAMI ORT</small>maayan jésed</span><span class="bb-r"><button class="bell bagbtn" id="bagbtn" data-act="bag" aria-label="Mi bolsa"></button><button class="bell" id="bell" data-act="notifs" aria-label="Notificaciones"></button><button class="rolebtn" id="rolebtn" data-act="roles"></button></span></header>
 <div class="app" id="app">
  <div id="student" class="stack14">
   <div class="row" style="gap:8px">
@@ -747,10 +766,10 @@ const myPts=()=>approved().reduce((a,s)=>a+s.pts,0);
 const isAdmin=()=>S.role==='admin';
 function lvlDone(t,L){return approved().filter(s=>{const r=s.rid&&reto(s.rid);return r&&r.trk===t&&r.lvl===L}).length}
 function nextLvlCard(t){const L=lvlOf(t),ok=Math.min(2,lvlDone(t,L)),rev=S.subs.filter(s=>s.status==='pending'&&(()=>{const x=s.rid&&reto(s.rid);return x&&x.trk===t&&x.lvl===L})()).length,who=t==='colegio'?'tu maestro':t==='casa'?'tu familia':'tu familia o maestro';
- return `<h2 style="font-size:22px">${ic('lock',20)} Nivel ${L+1} · ${LV[L+1]}</h2><p style="margin:0">Retos más retadores que valen <b>+${LVP[L+1]} ${(LVP[L+1])===1?'gota':'gotas'}</b>.</p><div class="nl-bar"><span style="width:${ok/2*100}%"></span></div><p style="margin:0;font-weight:900">${ok} de 2 retos aprobados${rev?` · ${rev} en revisión`:''}</p><ol class="nl-steps"><li>Haz los retos de tu bolsa.</li><li>Cuéntalos con «Sumar mi gota».</li><li>Los confirma ${who} y coordinación los aprueba.</li></ol><button class="btn small" data-act="expand">${ic('bag',18)} Abrir mi bolsa</button>`}
+ return `<h2 style="font-size:22px">${ic('lock',20)} Nivel ${L+1} · ${LV[L+1]}</h2><p style="margin:0">Retos más retadores que valen <b>+${LVP[L+1]} ${(LVP[L+1])===1?'gota':'gotas'}</b>.</p><div class="nl-bar"><span style="width:${ok/2*100}%"></span></div><p style="margin:0;font-weight:900">${ok} de 2 retos aprobados${rev?` · ${rev} en revisión`:''}</p><ol class="nl-steps"><li>Haz un reto de este nivel.</li><li>Toca «¡Lo hago!» y cuéntalo.</li><li>Lo confirma ${who} y coordinación lo autoriza.</li></ol><button class="btn small" data-act="bag">${ic('bag',18)} Ver mi bolsa</button>`}
 function lvlOf(t){let L=1;while(L<3&&lvlDone(t,L)>=2)L++;return L}
 function subOf(rid){const l=S.subs.filter(s=>s.rid===rid);return l[l.length-1]}
-function stOf(rid){const s=subOf(rid);if(s&&s.status==='approved')return 'done';if(s&&s.status==='pending')return 'review';if(s&&s.status==='rejected')return 'fix';return S.accepted.includes(rid)?'todo':'none'}
+function stOf(rid){const s=subOf(rid);if(s&&s.status==='approved')return 'done';if(s&&s.status==='pending')return 'review';if(s&&s.status==='rejected')return 'fix';return 'none'}
 function streak(){const v=new Set(S.visits);let n=0,d=new Date();for(let i=0;i<400;i++){if(!v.has(dayKey(d)))break;n++;d.setDate(d.getDate()-1)}return n}
 const cicloIni=()=>{const d=new Date(dayKey()+'T00:00:00'),y=d.getMonth()>=7?d.getFullYear():d.getFullYear()-1;return new Date(y,7,1).getTime()};
 function fount(){const t={...BASE},c0=cicloIni();allApproved().filter(s=>(s.at||Date.now())>=c0).forEach(s=>{t[s.sec]=(t[s.sec]||0)+s.pts});return{t,total:Object.values(t).reduce((a,b)=>a+b,0)}}
@@ -834,8 +853,8 @@ function swipe(dir){const el=document.getElementById('front'),q=queue();if(!el||
  const an=el.animate(kf,{duration:dragged?380:560,easing:'cubic-bezier(.5,.05,.7,.4)',fill:'forwards'});
  an.onfinish=()=>{if(S.role==='maestro')validate(x.id,dir>0);else if(isAdmin())decide(x.id,true);else if(dir>0)accept(x.id);else{skipped=skipped.filter(i=>i!==x.id);skipped.push(x.id);renderDeck(true)}}}
 
-function accept(id){if(!S.accepted.includes(id))S.accepted.push(id);save();const r0=reto(id);renderAll(true);flyToBag(r0?r0.t:'Reto');toast('Guardado en «Mi bolsa» (abajo). Cuando lo hagas, ábrela y cuéntalo.')}
-function flyToBag(t){const b=document.getElementById('minibag');if(!b||!b.offsetParent)return;const c=document.createElement('span');c.className='flychip';c.textContent=t.length>22?t.slice(0,21)+'…':t;document.body.appendChild(c);const W=innerWidth,H=innerHeight;c.style.left=(W/2-c.offsetWidth/2)+'px';c.style.top=(H*.4)+'px';const bb=b.getBoundingClientRect();requestAnimationFrame(()=>{c.style.transform=`translate(${bb.left+bb.width/2-W/2}px,${bb.top-H*.4}px) scale(.3)`;c.style.opacity='.2'});setTimeout(()=>{c.remove();b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')},700)}
+function accept(id){renderDeck(true);startDone(id)}
+function flyToBag(t){const b=document.getElementById('bagbtn');if(!b||!b.offsetParent)return;const c=document.createElement('span');c.className='flychip';c.textContent=t.length>22?t.slice(0,21)+'…':t;document.body.appendChild(c);const W=innerWidth,H=innerHeight;c.style.left=(W/2-c.offsetWidth/2)+'px';c.style.top=(H*.4)+'px';const bb=b.getBoundingClientRect();requestAnimationFrame(()=>{c.style.transform=`translate(${bb.left+bb.width/2-W/2}px,${bb.top-H*.4}px) scale(.3)`;c.style.opacity='.2'});setTimeout(()=>{c.remove();b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')},700)}
 
 /* ---------- Pantalla ---------- */
 function renderTop(){const fe=nextFest(),d=daysTo(fe.from),pend=S.subs.filter(s=>s.status==='pending').length;
@@ -856,11 +875,11 @@ function renderSpring(){const f=fount(),g=nextGoal(),pct=f.total/g;
  const items=[...mine.map(r=>({k:stOf(r.id),t:r.t,c:CAT[r.cat],id:r.id,act:'tray'})),...own.map(s=>({k:s.status==='pending'?'review':'fix',t:s.title,c:CAT[s.cat],id:s.id,act:'trayown'}))];
  document.getElementById('springin').innerHTML=`
  <button class="sp-close" data-act="collapse" aria-label="Hacer más pequeño">${ic('down',18,'#FFFFFF',2.6)}</button><div class="wcards"><button class="wcard" data-act="spring"><span class="wic">${drop(16,'var(--water)')}</span><span class="wtx"><b>Reto final del colegio</b><span>${nf(f.total)} de ${nf(g)} gotas</span><span class="bar"><span style="width:${Math.min(100,f.total/g*100)}%"></span></span></span></button><button class="wcard" data-act="stories"><span class="wic">${ic('chat',18,'var(--primary)')}</span><span class="wtx"><b>Historias de hoy</b><span id="story"></span><span class="more">Leer todas</span></span></button></div>
- ${isAdmin()?'':'<b class="tray-h">Mi bolsa · tócalo cuando lo hagas</b>'}<div class="tray" aria-label="Mi bolsa de retos">${isAdmin()?`<button class="tdrop" data-act="create">${ic('plus',18)} Crear reto</button><button class="tdrop" data-act="aviso">${ic('chat',18)} Publicar aviso</button><button class="tdrop" data-act="log">${ic('check',18)} Decisiones</button>`:items.length?items.map(it=>`<button class="tdrop ${it.k}" data-act="${it.act}" data-id="${it.id}">${drop(16,it.c)}<span class="t">${esc(it.t)}</span>${it.k==='review'?ic('clock',16):it.k==='fix'?`<b style="color:var(--warn)">¡Corrige!</b>`:''}</button>`).join(''):`<span class="empty">Tu bolsa está vacía: desliza un reto a la derecha →</span>`}</div>
+ <div class="tray" aria-label="Mi bolsa de retos" ${isAdmin()?'':'hidden'}>${isAdmin()?`<button class="tdrop" data-act="create">${ic('plus',18)} Crear reto</button><button class="tdrop" data-act="aviso">${ic('chat',18)} Publicar aviso</button><button class="tdrop" data-act="log">${ic('check',18)} Decisiones</button>`:items.length?items.map(it=>`<button class="tdrop ${it.k}" data-act="${it.act}" data-id="${it.id}">${drop(16,it.c)}<span class="t">${esc(it.t)}</span>${it.k==='review'?ic('clock',16):it.k==='fix'?`<b style="color:var(--warn)">¡Corrige!</b>`:''}</button>`).join(''):`<span class="empty">Tu bolsa está vacía: desliza un reto a la derecha →</span>`}</div>
  ${isAdmin()?`<button class="big" data-act="role" data-id="alumno">${ic('back',22,'var(--sun-ink)',2.6)} Volver a vista de alumno</button>`:`<div class="sp-row"><button class="minibag" id="minibag" data-act="expand" aria-label="Abrir mi bolsa: ${items.length} retos">${ic('bag',20)}<span>Mi bolsa</span><i class="mb-n">${items.length}</i></button><button class="big" data-act="own">${ic('plus',24,'var(--sun-ink)',3)} Sumar mi gota</button></div>`}`;
  showStory();springMode()}
 let springForce=null,forceY=0;
-function springMode(){const sp=document.getElementById('spring');if(!sp)return;if(springForce&&Math.abs(scrollY-forceY)>60)springForce=null;const bottom=scrollY+innerHeight>=document.documentElement.scrollHeight-140;sp.classList.toggle('mini',springForce?springForce==='mini':!bottom)}
+function springMode(){const sp=document.getElementById('spring');if(!sp)return;sp.classList.remove('mini');return;if(springForce&&Math.abs(scrollY-forceY)>60)springForce=null;const bottom=scrollY+innerHeight>=document.documentElement.scrollHeight-140;sp.classList.toggle('mini',springForce?springForce==='mini':!bottom)}
 addEventListener('scroll',springMode,{passive:true});addEventListener('resize',springMode);
 function feed(){const mine=allApproved().sort((a,b)=>a.at-b.at).map(s=>{const o=S.role==='alumno'&&s.owner===curSid(),a=stuAcc(s.owner);return {id:s.id,sec:s.sec,grp:s.anon?'Anónimo':o?'Tú':(a?a.name.split(' ')[0]+' · '+a.grp:'Alumno'),cat:s.cat,pts:s.pts,text:s.text,likes:0,mine:o,real:true,photo:s.show?s.photo:null}});return [...mine.reverse(),...SEED]}
 function showStory(){const L=feed(),p=L[storyIdx%L.length],el=document.getElementById('story');if(el)el.textContent=SEC[p.sec]+': «'+p.text+'»'}
@@ -980,7 +999,7 @@ function step1(){const own=!D.rid;
  <div class="stack" style="gap:8px"><b style="font-size:14px">Foto (opcional)</b>
  ${!S.consent.fotos?'<p class="hint">Tu familia no autorizó subir fotos. Puede cambiarlo en Permisos.</p>':D.photo?`<div class="ph"><img src="${D.photo}" alt="Foto que adjuntaste"></div><label class="check" for="d-faces"><input type="checkbox" id="d-faces" ${D.faces?'checked':''}> Las personas que aparecen están de acuerdo en salir en la foto.</label><label class="check" for="d-show"><input type="checkbox" id="d-show" ${D.show?'checked':''}> Mostrarla en Comunidad si se aprueba.</label><button class="linkbtn" data-act="rmphoto" style="align-self:flex-start">Borrar foto</button>`:`<label class="upl" for="d-photo">${ic('camera',20)} Agregar una foto<input type="file" id="d-photo" accept="image/jpeg,image/png,image/webp"></label>`}
  <p class="hint">No da gotas extra. Solo la ve el coordinador, salvo que elijas mostrarla, y se borra después de la revisión.</p></div>
- <label class="check" for="d-vol"><input type="checkbox" id="d-vol" ${D.vol?'checked':''}> Lo hice porque quise; nadie me obligó.</label>
+ <label class="check" for="d-vol"><input type="checkbox" id="d-vol" ${D.vol?'checked':''}> <b>Ya lo hice</b>, de verdad y porque quise.</label>
  <label class="check" for="d-anon"><input type="checkbox" id="d-anon" ${D.anon||!S.consent.nombre?'checked':''} ${!S.consent.nombre?'disabled':''}> Que no aparezca mi nombre.${!S.consent.nombre?' Tu familia lo pidió.':''}</label>
  <button class="btn full" data-act="step2">Siguiente ${ic('arrow',20)}</button>`)}
 function scrub(t,names){let o=String(t).replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'X').replace(/\+?\d[\d\s()-]{7,}\d/g,'X');names.forEach(n=>{n=n.trim();if(n.length>1)o=o.replace(new RegExp('(^|[^\\p{L}])'+n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![\\p{L}])','giu'),'$1X')});return o}
@@ -994,7 +1013,7 @@ function step2(){
 function send(){const text=scrub(D.text,(document.getElementById('d-names').value||'').split(','));
  if(D.resend){const s=S.subs.find(x=>x.id===D.resend);Object.assign(s,{text,status:'pending',comment:'',at:Date.now(),photo:D.photo||null,show:!!D.show})}
  else S.subs.push({id:'u'+Date.now(),owner:curSid(),rid:D.rid,title:D.title,text,cat:D.cat,sec:D.sec,anon:D.anon,status:'pending',pts:D.rid?reto(D.rid).pts:1,at:Date.now(),photo:D.photo||null,show:!!D.show});
- save();closeSheet();renderAll();toast('¡Enviada! Sumará gotas cuando un coordinador la apruebe.')}
+ save();closeSheet();renderAll(true);flyToBag(D.title||'Reto');toast('¡Listo! Está en tu bolsa, pendiente de que coordinación lo autorice.')}
 
 /* ---------- Revisión ---------- */
 function returnSheet(id){const s=S.subs.find(x=>x.id===id);
@@ -1048,8 +1067,12 @@ function aiBox(s){const a=aiCheck(s);return `<div class="ai"><b>${ic('spark',16)
 function speak(t){try{if(!('speechSynthesis' in window))throw 0;const u=new SpeechSynthesisUtterance(t);u.lang='es-MX';u.rate=.92;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){toast('Este navegador no puede leer en voz alta.')}}
 const tvFeed=()=>{const L=feed(),f=L.filter(p=>S.featured.includes(p.id));return f.length?[...f,...L.filter(p=>!S.featured.includes(p.id))]:L};
 
-function renderChrome(){const u=S.notifs.filter(n=>!n.read).length,b=document.getElementById('bell');b.hidden=!(S.role==='alumno'||S.role==='familia');b.innerHTML=ic('bell',20)+(u?`<i>${u}</i>`:'');b.setAttribute('aria-label',`Notificaciones${u?`: ${u} sin leer`:''}`);
- const rb=document.getElementById('rolebtn');rb.innerHTML=`${ic(ROLE_I[S.role],16)} ${ROLE_S[S.role]} ${ic('down',14)}`;rb.setAttribute('aria-label','Cambiar de rol. Ahora: '+ROLE_N[S.role])}
+function bagItems(){const o={rejected:0,pending:1,approved:2};return (S.subs||[]).slice().sort((a,b)=>o[a.status]-o[b.status]||b.at-a.at)}
+function bagState(s){if(s.status==='approved')return ['Autorizado','var(--ok,#1E8A4C)'];if(s.status==='rejected')return ['¡Corrige! Tócalo','var(--warn)'];const n=needVal(s);if(n&&!s.val)return [`Pendiente: confirma tu ${n==='maestro'?'maestro':'familia'} y luego coordinación`,'var(--muted)'];return ['Pendiente de autorización de coordinación','var(--muted)']}
+function bagSheet(){const L=bagItems(),tot=L.filter(s=>s.status==='approved').reduce((a,s)=>a+s.pts,0),pend=L.filter(s=>s.status==='pending').length;
+ sheet(`<div class="eyebrow">${ic('bag',14)} Mi bolsa</div><h2 style="font-size:26px">${L.length?'Mis retos realizados':'Aún no subes retos'}</h2><p class="muted" style="font-weight:700">${L.length?`${pend?`${pend} pendiente${pend===1?'':'s'} de autorización. `:''}Cuando coordinación los autoriza, suman gotas.`:'Elige un reto, hazlo y toca «¡Lo hago!» para contarlo. Aquí verás si ya lo autorizaron.'}</p>${L.map(x=>{const [lab,c]=bagState(x),R=x.rid&&reto(x.rid),cat=CAT[x.cat]||'var(--water)',body=`${drop(22,cat)}<span><b>${esc(x.title)}</b><small style="color:${c}">${x.status==='approved'?ic('check',13,c,3)+' ':''}${lab}</small></span>${x.status==='approved'?`<em class="bagpts">+${x.pts} ${x.pts===1?'gota':'gotas'}</em>`:x.status==='rejected'?ic('arrow',18):ic('clock',18,'var(--muted)')}`;return x.status==='rejected'?`<button class="bagrow fix" data-act="${R?'tray':'trayown'}" data-id="${R?x.rid:x.id}">${body}</button>`:`<div class="bagrow ${x.status}">${body}</div>`}).join('')}${L.length?`<div class="bagtot"><span>Total ganado</span><b>${drop(18,'var(--water)')} ${tot} ${tot===1?'gota':'gotas'}</b></div>`:''}<button class="btn full" data-act="close" style="margin-top:6px">Seguir viendo retos</button>`)}
+function renderChrome(){const u=S.notifs.filter(n=>!n.read).length,b=document.getElementById('bell');{const bb=document.getElementById('bagbtn'),n=S.role==='alumno'?(S.subs||[]).filter(x=>x.status!=='approved').length:0;bb.hidden=S.role!=='alumno';bb.innerHTML=ic('bag',21)+(n?`<i>${n}</i>`:'');bb.setAttribute('aria-label',`Mi bolsa: ${n} pendientes`)}b.hidden=!(S.role==='alumno'||S.role==='familia');b.innerHTML=ic('bell',20)+(u?`<i>${u}</i>`:'');b.setAttribute('aria-label',`Notificaciones${u?`: ${u} sin leer`:''}`);
+ const rb=document.getElementById('rolebtn');rb.innerHTML=`${ic(ROLE_I[S.role],16)}<span class="rl">${ROLE_S[S.role]}</span>${ic('down',14)}`;rb.setAttribute('aria-label','Cambiar de rol. Ahora: '+ROLE_N[S.role])}
 document.addEventListener('change',e=>{const t=e.target;if(t&&/^(rg-mail|lg-mail|rg-kidmail)$/.test(t.id)){const v=t.value.trim();if(v&&!v.includes('@'))t.value=v+'@olamiort.edu.mx'}},true);
 function renderLogin(){const el=document.getElementById('login');document.body.classList.toggle('prelogin',!S.logged);if(S.logged){el.hidden=true;el.innerHTML='';return}el.hidden=false;const fe=nextFest(),reg=renderLogin.r||'alumno',sec=renderLogin.s||'Primaria';
  el.innerHTML=`<div class="landing">
@@ -1216,7 +1239,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(
  case 'req':{const q=S.accounts.find(x=>x.id===id),ok=t.dataset.ok==='1';q.status=ok?'approved':'rejected';S.log.push({title:`Cuenta de maestro: ${q.name}`,status:q.status,comment:`${SEC[q.sec]} · ${q.grp}`,by:'Coordinación',at:Date.now()});save();renderAll();toast(ok?'Cuenta de maestro autorizada.':'Solicitud rechazada.');break}
  case 'gotas':gotasSheet();break;
  case 'racha':rachaSheet();break;
- case 'expand':springForce='full';forceY=scrollY;springMode();break;
+ case 'expand':bagSheet();break;
  case 'collapse':springForce='mini';forceY=scrollY;springMode();break;
  case 'login':setAccount(id);break;
  case 'loginmail':{const m=((document.getElementById('lg-mail')||{}).value||'').trim().toLowerCase(),a=S.accounts.find(x=>x.email.toLowerCase()===m);if(!a)toast('No encontramos una cuenta con ese correo.');else if(a.status==='pending')toast('Tu cuenta de maestro sigue en revisión.');else if(a.status==='rejected')toast('Esta cuenta no fue autorizada.');else setAccount(a.id);break}
@@ -1224,13 +1247,14 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(
  case 'setrole':setRole(id);break;
  case 'logout':save();S.cur=null;bind();save();closeSheet();renderAll();break;
  case 'ptab':ptab=id;renderAll(true);break;
+ case 'bag':bagSheet();break;
  case 'notifs':notifSheet();break;
  case 'install':installSheet();break;
  case 'hours':hoursSheet();break;
  case 'cert':certSheet();break;
  case 'speak':{const r=reto(n);if(r)speak(`${r.t}. ${r.d}. ${howOf(r).map((x,i)=>`Paso ${i+1}: ${x}`).join(' ')}`);break}
  case 'val':validate(id,t.dataset.ok==='1');break;
- case 'propose':if(!S.accepted.includes(n))S.accepted.push(n);notify(`Tu familia te propuso un reto: «${reto(n).t}». Ya está en tu bolsa.`);save();renderAll();toast('Listo: el reto ya está en su bolsa.');break;
+ case 'propose':notify(`Tu familia te propuso un reto: «${reto(n).t}». Cuando lo hagan juntos, cuéntalo con «¡Lo hago!».`);save();renderAll();toast('Listo: le avisamos que se lo propusiste.');break;
  case 'remind':if(!S.remind.includes(id))S.remind.push(id);save();renderAll();toast('Recordatorio enviado (simulado).');break;
  case 'hrs':{const h=S.hours.find(x=>x.id===id),ok=t.dataset.ok==='1';h.status=ok?'approved':'rejected';S.log.push({title:`Servicio social: ${h.org} (${h.hrs} h)`,status:h.status,comment:'',by:'Coordinación',at:Date.now()});notify(ok?`Confirmaron ${h.hrs} h de servicio social en ${h.org}.`:`Revisa tu registro de horas en ${h.org}.`,h.owner);save();renderAll();toast(ok?'Horas confirmadas.':'Registro rechazado.');break}
  case 'feat':S.featured=S.featured.includes(id)?S.featured.filter(x=>x!==id):[...S.featured,id];save();storiesSheet();break;
@@ -1238,19 +1262,19 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(
  case 'realdate':S.simDate='';save();renderAll();toast('De vuelta a la fecha real.');break;
  case 'how':howSheet(n);break;
  case 'howfront':{const q=queue();if(q.length&&S.role==='alumno')howSheet(q[0].id);break}
- case 'accepth':closeSheet();accept(n);break;
+ case 'accepth':startDone(n);break;
  case 'salones':salonSheet();break;
  case 'stories':storiesSheet();break;
  case 'sfil':storiesSheet.f=id;storiesSheet();break;
  case 'like':S.likes=S.likes.includes(id)?S.likes.filter(x=>x!==id):[...S.likes,id];save();storiesSheet();break;
- case 'tray':{const st=stOf(n);if(st==='review')toast('Ya la enviaste. Está en revisión.');else startDone(n);break}
+ case 'tray':{const st=stOf(n);if(st==='review')toast('Ya lo subiste. Está pendiente de autorización.');else startDone(n);break}
  case 'trayown':{const s=S.subs.find(x=>x.id===id);if(s.status==='pending')toast('Ya la enviaste. Está en revisión.');else startDone(null,id);break}
  case 'own':startDone(null);break;
- case 'acceptc':if(reto(n).fest&&reto(n).fest!==fkey(nextFest())){toast('Este reto se desbloquea en su temporada.');break}if(!S.accepted.includes(n))S.accepted.push(n);save();renderAll(true);calSheet();toast('Guardado en tu bolsa.');break;
+ case 'acceptc':if(reto(n).fest&&reto(n).fest!==fkey(nextFest())){toast('Este reto se desbloquea en su temporada.');break}startDone(n);break;
  case 'dcat':keep();D.cat=id;step1();break;
  case 'rmphoto':keep();D.photo=null;D.faces=false;D.show=false;step1();break;
  case 'step2':{keep();D.text=D.text.trim();D.title=D.title.trim();
-  if(!D.rid&&D.title.length<4){toast('Escribe un título corto.');return}if(D.text.length<15){toast('Cuéntanos un poco más: al menos una oración.');return}if(!D.vol){toast('Confirma que fue una acción voluntaria.');return}if(D.photo&&!D.faces){toast('Confirma que las personas de la foto están de acuerdo en salir.');return}step2();break}
+  if(!D.rid&&D.title.length<4){toast('Escribe un título corto.');return}if(D.text.length<15){toast('Cuéntanos un poco más: al menos una oración.');return}if(!D.vol){toast('Solo puedes subirlo cuando ya lo hiciste. Marca «Ya lo hice».');return}if(D.photo&&!D.faces){toast('Confirma que las personas de la foto están de acuerdo en salir.');return}step2();break}
  case 'back1':step1();break;
  case 'send':if(!document.getElementById('d-ok').checked){toast('Marca la casilla de revisión.');return}send();break;
  case 'close':case 'bgclose':closeSheet();break;
