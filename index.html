@@ -480,6 +480,8 @@ body.tv #tvroot{display:block}
 html.locked,html.locked body{overflow:hidden;overscroll-behavior:none}
 .sheet-bg{height:100dvh;touch-action:none}.sheet{touch-action:pan-y;max-height:min(88vh,88dvh)}
 @media (max-width:899px){.sheet{max-height:min(92vh,92dvh)}}
+.rb>span.lbl-no{color:var(--bad,#C0392B)}.rb>span.lbl-yes{color:var(--primary)}.rb .sg-ar{font-size:15px}.lbl-no .sg-ar{display:inline-block;animation:sgl 1.4s ease-in-out infinite}.lbl-yes .sg-ar{display:inline-block;animation:sgr 1.4s ease-in-out infinite}
+.sg-hand.mid{align-self:center;margin-top:-26px;font-size:28px}
 </style>
 
 </head>
@@ -844,9 +846,8 @@ function renderDeck(first){const deck=document.getElementById('deck'),Q=queue().
  deck.innerHTML=Q.map((x,i)=>isStaff()?subCardHTML(x,i,first,S.role==='maestro'?'val':''):cardHTML(x,i,first)).reverse().join('');
  document.getElementById('deckbtns').innerHTML=S.role==='maestro'?`<div class="rb"><button class="round" data-act="no" aria-label="No me consta">${ic('x',30,'var(--bad)',3)}</button><span>No me consta</span></div><div class="rb"><button class="round yes" data-act="yes" aria-label="Lo vi">${ic('check',40,'var(--on-primary)',3.2)}</button><span>Lo vi</span></div>`:isAdmin()
   ?`<div class="rb"><button class="round" data-act="no" aria-label="Regresar al alumno con un comentario">${ic('undo',30,'var(--bad)',2.8)}</button><span>Regresar</span></div><div class="rb"><button class="round yes" data-act="yes" aria-label="Aprobar">${ic('check',40,'var(--on-primary)',3.2)}</button><span>Aprobar</span></div><div class="rb"><button class="round info" data-act="adjust" aria-label="Ajustar gotas y comentar">${ic('chat',22)}</button><span>Comentar</span></div>`
-  :`<div class="rb"><button class="round" data-act="no" aria-label="Ver otra idea">${ic('x',30,'var(--bad)',3)}</button><span>Otra idea</span></div><div class="rb"><button class="round yes" data-act="yes" aria-label="¡Lo hago! Guardar en mi bolsa">${ic('check',40,'var(--on-primary)',3.2)}</button><span>¡Lo hago!</span></div>`;
- {const [L,R,extra]=S.role==='maestro'?['No me consta','Lo vi',`${queue().length} por confirmar`]:isAdmin()?['Regresar','Aprobar',`${queue().length} pendientes`]:['Otra idea','¡Lo hago!',''];
- document.getElementById('deckhint').innerHTML=`<span class="sg-t">Desliza la tarjeta</span><div class="swguide" aria-hidden="true"><span class="sg-l"><b class="sg-ar">‹‹</b>${L}</span><span class="sg-hand">👆</span><span class="sg-r">${R}<b class="sg-ar">››</b></span></div>${extra?`<span class="sg-x">${extra}</span>`:''}`;document.getElementById('deckhint').setAttribute('aria-label',`Desliza la tarjeta: a la izquierda ${L}, a la derecha ${R}`)}
+  :`<div class="rb"><button class="round" data-act="no" aria-label="Ver otra idea">${ic('x',30,'var(--bad)',3)}</button><span class="lbl-no"><b class="sg-ar">‹‹</b> Otra idea</span></div><span class="sg-hand mid" aria-hidden="true">👆</span><div class="rb"><button class="round yes" data-act="yes" aria-label="¡Lo hago! Cuéntalo">${ic('check',40,'var(--on-primary)',3.2)}</button><span class="lbl-yes">¡Lo hago! <b class="sg-ar">››</b></span></div>`;
+ {const extra=S.role==='maestro'?`${queue().length} por confirmar`:isAdmin()?`${queue().length} pendientes`:'';document.getElementById('deckhint').innerHTML=`<span class="sg-t">Desliza la tarjeta o toca un botón</span>${extra?`<span class="sg-x">${extra}</span>`:''}`}
  bindDrag();swipeDemo()}
 let demoDone=false;function swipeDemo(){if(demoDone)return;const el=document.getElementById('front');if(!el)return;demoDone=true;const h=document.createElement('span');h.className='swhand';h.setAttribute('aria-hidden','true');h.textContent='👆';el.appendChild(h);el.classList.add('swdemo');setTimeout(()=>{el.classList.remove('swdemo');h.remove()},2600)}
 
