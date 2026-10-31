@@ -15,6 +15,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap">
 <style>
+html,body{overflow-x:clip;max-width:100%}@supports not (overflow:clip){html,body{overflow-x:hidden}}
+
 /* Layout: una sola pantalla sin pestañas. Arriba: tu gota. Centro: baraja de retos que se desliza. Abajo: el manantial (agua fija) con tu bolsa de retos y el botón "Sumar mi gota". */
 :root{
   --bg:#FFF6E5; --surface:#FFFFFF; --ink:#2A1F3D; --muted:#6A5D7E; --line:#F1DFC0;
@@ -805,16 +807,18 @@ function renderDeck(first){const deck=document.getElementById('deck'),Q=queue().
  deck.innerHTML=Q.map((x,i)=>isStaff()?subCardHTML(x,i,first,S.role==='maestro'?'val':''):cardHTML(x,i,first)).reverse().join('');
  document.getElementById('deckbtns').innerHTML=S.role==='maestro'?`<div class="rb"><button class="round" data-act="no" aria-label="No me consta">${ic('x',30,'var(--bad)',3)}</button><span>No me consta</span></div><div class="rb"><button class="round yes" data-act="yes" aria-label="Lo vi">${ic('check',40,'var(--on-primary)',3.2)}</button><span>Lo vi</span></div>`:isAdmin()
   ?`<div class="rb"><button class="round" data-act="no" aria-label="Regresar al alumno con un comentario">${ic('undo',30,'var(--bad)',2.8)}</button><span>Regresar</span></div><div class="rb"><button class="round yes" data-act="yes" aria-label="Aprobar">${ic('check',40,'var(--on-primary)',3.2)}</button><span>Aprobar</span></div><div class="rb"><button class="round info" data-act="adjust" aria-label="Ajustar gotas y comentar">${ic('chat',22)}</button><span>Comentar</span></div>`
-  :`<div class="rb"><button class="round" data-act="no" aria-label="Ver otra idea">${ic('x',30,'var(--bad)',3)}</button><span>Otra idea</span></div><div class="rb"><button class="round yes" data-act="yes" aria-label="¡Lo hago! Guardar en mi bolsa">${ic('check',40,'var(--on-primary)',3.2)}</button><span>¡Lo hago!</span></div><div class="rb"><button class="round info" data-act="howfront" aria-label="Cómo hacer este reto">${ic('info',24)}</button><span>Cómo se hace</span></div>`;
+  :`<div class="rb"><button class="round" data-act="no" aria-label="Ver otra idea">${ic('x',30,'var(--bad)',3)}</button><span>Otra idea</span></div><div class="rb"><button class="round yes" data-act="yes" aria-label="¡Lo hago! Guardar en mi bolsa">${ic('check',40,'var(--on-primary)',3.2)}</button><span>¡Lo hago!</span></div>`;
  document.getElementById('deckhint').textContent=S.role==='maestro'?`O arrastra la tarjeta: ← no me consta · lo vi → · ${queue().length} por confirmar`:isAdmin()?`O arrastra la tarjeta: ← regresar · aprobar → · ${queue().length} pendientes`:'O arrastra la tarjeta: ← otra idea · ¡lo hago! →';
  bindDrag();swipeDemo()}
 let demoDone=false;function swipeDemo(){if(demoDone)return;const el=document.getElementById('front');if(!el)return;demoDone=true;const h=document.createElement('span');h.className='swhand';h.setAttribute('aria-hidden','true');h.textContent='👆';el.appendChild(h);el.classList.add('swdemo');setTimeout(()=>{el.classList.remove('swdemo');h.remove()},2600)}
 
-function bindDrag(){const el=document.getElementById('front');if(!el||!queue().length)return;let sx=0,sy=0,dx=0,on=false;
+function bindDrag(){const el=document.getElementById('front');if(!el||!queue().length)return;let sx=0,sy=0,dx=0,dy0=0,on=false,lx=0,lt=0,vx=0,axis='';
+ el.addEventListener('animationend',()=>el.classList.remove('new'));
+ el.addEventListener('touchmove',e=>{if(on&&axis==='x')e.preventDefault()},{passive:false});
  const yes=el.querySelector('.stamp.yes'),no=el.querySelector('.stamp.no');
- el.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('button'))return;on=true;sx=e.clientX;sy=e.clientY;dx=0;el.setPointerCapture(e.pointerId);el.classList.add('dragging')});
- el.addEventListener('pointermove',e=>{if(!on)return;dx=e.clientX-sx;const dy=(e.clientY-sy)*.25;el.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/14}deg)`;const b1=el.parentNode.querySelector('.dcard.b1');if(b1){const k=Math.min(1,Math.abs(dx)/160);b1.style.transition='none';b1.style.transform=`translateY(${16-16*k}px) scale(${.94+.06*k})`}yes.style.opacity=Math.max(0,Math.min(1,dx/90));no.style.opacity=Math.max(0,Math.min(1,-dx/90))});
- const end=()=>{if(!on)return;on=false;el.classList.remove('dragging');if(Math.abs(dx)>100)swipe(dx>0?1:-1);else{el.style.transform='';yes.style.opacity=0;no.style.opacity=0;const b1=el.parentNode.querySelector('.dcard.b1');if(b1){b1.style.transition='';b1.style.transform=''}}};
+ el.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('button')||el.dataset.going)return;on=true;axis='';sx=lx=e.clientX;sy=e.clientY;lt=e.timeStamp;dx=0;vx=0;el.classList.remove('new','swdemo');const h=el.querySelector('.swhand');if(h)h.remove();el.getAnimations().forEach(a=>a.cancel());try{el.setPointerCapture(e.pointerId)}catch(_){}el.classList.add('dragging')});
+ el.addEventListener('pointermove',e=>{if(!on)return;dx=e.clientX-sx;dy0=e.clientY-sy;if(!axis&&(Math.abs(dx)>8||Math.abs(dy0)>8))axis=Math.abs(dx)>=Math.abs(dy0)?'x':'y';const dt=e.timeStamp-lt;if(dt>0){vx=.8*((e.clientX-lx)/dt)+.2*vx;lx=e.clientX;lt=e.timeStamp}const dy=(e.clientY-sy)*.25;el.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/14}deg)`;const b1=el.parentNode.querySelector('.dcard.b1');if(b1){const k=Math.min(1,Math.abs(dx)/160);b1.style.transition='none';b1.style.transform=`translateY(${16-16*k}px) scale(${.94+.06*k})`}yes.style.opacity=Math.max(0,Math.min(1,dx/90));no.style.opacity=Math.max(0,Math.min(1,-dx/90))});
+ const end=()=>{if(!on)return;on=false;el.classList.remove('dragging');if(Math.abs(dx)>80||(Math.abs(dx)>35&&Math.abs(vx)>.35))swipe(dx>0?1:-1);else{el.style.transform='';yes.style.opacity=0;no.style.opacity=0;const b1=el.parentNode.querySelector('.dcard.b1');if(b1){b1.style.transition='';b1.style.transform=''}}};
  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
  el.addEventListener('keydown',e=>{if(e.key==='ArrowRight')swipe(1);if(e.key==='ArrowLeft')swipe(-1)})}
 
