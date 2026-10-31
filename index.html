@@ -761,7 +761,7 @@ const DEF={v:5,cur:null,
 const PKEYS=['v','cur','cat','invites','accounts','studs','custom','avisos','log','featured','remind','proposals','requests','simDate','settings'];
 
 /* ---------- Estado ---------- */
-let S=load();S.cur=null;S.logged=false;/* cada visita empieza en la landing */if(!Array.isArray(S.cat))S.cat=JSON.parse(JSON.stringify(R));let catSec='Primaria-alta';
+let S=load();const SS=(()=>{try{return JSON.parse(sessionStorage.getItem('mj-sesion')||'null')}catch(e){return null}})();/* primera visita en esta pestaña: landing; al refrescar: te quedas donde estabas */if(!SS){S.cur=null;S.logged=false}if(!Array.isArray(S.cat))S.cat=JSON.parse(JSON.stringify(R));let catSec='Primaria-alta';
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.v===5)return Object.assign(JSON.parse(JSON.stringify(DEF)),s)}catch(e){}return JSON.parse(JSON.stringify(DEF))}
 function save(){const sid=curSid();if(sid&&S.studs[sid]&&S.subs){Object.assign(S.studs[sid],{accepted:S.accepted,subs:S.subs,likes:S.likes,visits:S.visits,goal:S.goal,kinder:S.kinder,consent:S.consent,notifs:S.notifs,notifSet:S.notifSet,hours:S.hours})}const o={};PKEYS.forEach(k=>o[k]=S[k]);try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
 /* ---------- Cuentas: cada una con su rol fijo ---------- */
@@ -1348,7 +1348,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelec
 /* ---------- Inicio ---------- */
 function seedVisits(){const d=new Date();for(let i=4;i>=1;i--){const x=new Date(d);x.setDate(d.getDate()-i);S.visits.push(dayKey(x))}}
 (function boot(){bind();if(S.logged&&S.role==='alumno'){if(!S.visits.length)seedVisits();if(!S.visits.includes(dayKey()))S.visits.push(dayKey())}save();renderAll(true);route();
- storyTimer=setInterval(()=>{storyIdx++;showStory()},5000)})();
+ storyTimer=setInterval(()=>{storyIdx++;showStory()},5000);
+ if(SS&&S.cur){if(SS.ptab)ptab=SS.ptab;if(SS.filter)filter=SS.filter;renderAll(true);requestAnimationFrame(()=>scrollTo(0,SS.y||0))}
+ const keepSesion=()=>{try{sessionStorage.setItem('mj-sesion',JSON.stringify({ptab,filter,y:lockY!==null?lockY:scrollY}))}catch(e){}};keepSesion();addEventListener('pagehide',keepSesion);addEventListener('beforeunload',keepSesion);document.addEventListener('visibilitychange',keepSesion);setInterval(keepSesion,2000)})();
 </script>
 
 </body>
