@@ -816,9 +816,15 @@ function bindDrag(){const el=document.getElementById('front');if(!el||!queue().l
 
 function swipe(dir){const el=document.getElementById('front'),q=queue();if(!el||!q.length)return;const x=q[0];
  if(isAdmin()&&dir<0){el.style.transform='';returnSheet(x.id);return}
- el.querySelector(dir>0?'.stamp.yes':'.stamp.no').style.opacity=1;
- el.style.transform=`translate(${dir*innerWidth}px,-40px) rotate(${dir*28}deg)`;el.style.opacity='0';
- setTimeout(()=>{if(S.role==='maestro')validate(x.id,dir>0);else if(isAdmin())decide(x.id,true);else if(dir>0)accept(x.id);else{skipped=skipped.filter(i=>i!==x.id);skipped.push(x.id);renderDeck(true)}},260)}
+ if(el.dataset.going)return;el.dataset.going='1';
+ const st=el.querySelector(dir>0?'.stamp.yes':'.stamp.no'),cur=getComputedStyle(el).transform,dragged=!!el.style.transform;
+ const btn=document.querySelector(`.deck-btns [data-act="${dir>0?'yes':'no'}"]`);if(btn)btn.animate([{transform:'scale(1)'},{transform:'scale(.86)'},{transform:'scale(1.08)'},{transform:'scale(1)'}],{duration:420,easing:'ease-out'});
+ el.style.transition='none';
+ const kf=dragged?[{transform:cur==='none'?'none':cur},{transform:`translate(${dir*(innerWidth+240)}px,-70px) rotate(${dir*32}deg)`,opacity:0}]
+  :[{transform:'translate(0,0) rotate(0deg)'},{transform:`translate(${-dir*14}px,4px) rotate(${-dir*2}deg)`,offset:.18},{transform:`translate(${dir*70}px,-8px) rotate(${dir*8}deg)`,offset:.5},{transform:`translate(${dir*(innerWidth+240)}px,-70px) rotate(${dir*32}deg)`,opacity:0}];
+ if(st)st.animate([{opacity:+getComputedStyle(st).opacity||0},{opacity:1,offset:dragged?.2:.45},{opacity:1}],{duration:dragged?420:820,fill:'forwards'});
+ const an=el.animate(kf,{duration:dragged?420:820,easing:'cubic-bezier(.45,0,.25,1)',fill:'forwards'});
+ an.onfinish=()=>{if(S.role==='maestro')validate(x.id,dir>0);else if(isAdmin())decide(x.id,true);else if(dir>0)accept(x.id);else{skipped=skipped.filter(i=>i!==x.id);skipped.push(x.id);renderDeck(true)}}}
 
 function accept(id){if(!S.accepted.includes(id))S.accepted.push(id);save();const r0=reto(id);renderAll(true);flyToBag(r0?r0.t:'Reto');toast('Guardado en «Mi bolsa» (abajo). Cuando lo hagas, ábrela y cuéntalo.')}
 function flyToBag(t){const b=document.getElementById('minibag');if(!b||!b.offsetParent)return;const c=document.createElement('span');c.className='flychip';c.textContent=t.length>22?t.slice(0,21)+'…':t;document.body.appendChild(c);const W=innerWidth,H=innerHeight;c.style.left=(W/2-c.offsetWidth/2)+'px';c.style.top=(H*.4)+'px';const bb=b.getBoundingClientRect();requestAnimationFrame(()=>{c.style.transform=`translate(${bb.left+bb.width/2-W/2}px,${bb.top-H*.4}px) scale(.3)`;c.style.opacity='.2'});setTimeout(()=>{c.remove();b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')},700)}
