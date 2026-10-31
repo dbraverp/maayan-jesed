@@ -158,7 +158,8 @@ body.prelogin .app,body.prelogin .spring,body.prelogin .brandbar{display:none}
 .ld-season h2,.ld-season p{color:#FFFFFF}
 .ld-season p{font-weight:700}
 .ld-list{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-weight:700;font-size:16px}
-.ld-form{max-width:580px}
+.ld-form{max-width:580px;margin-inline:auto;width:100%}
+#registro{display:flex;flex-direction:column;align-items:center}
 .objl{font-size:14px!important;font-weight:800!important;display:flex;gap:6px;align-items:flex-start;color:var(--ink)}
 .objl svg{flex:none;margin-top:2px}
 .objbox{border-radius:18px;padding:14px;background:color-mix(in srgb,var(--sun) 22%,var(--surface));border:2px solid var(--sun);display:flex;flex-direction:column;gap:8px}
@@ -197,18 +198,18 @@ body.prelogin .app,body.prelogin .spring,body.prelogin .brandbar{display:none}
 .ld-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;text-align:center}
 .ld-stats b{display:block;font-size:clamp(32px,6vw,56px);font-weight:900;color:var(--primary);font-variant-numeric:tabular-nums;line-height:1.05}
 .ld-stats span{font-weight:800;color:var(--muted);font-size:14px}
-.ld-flow h2{font-size:clamp(22px,4vw,30px);margin:0 0 14px;letter-spacing:-.5px}
-.ld-flow ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;position:relative}
-.ld-flow li{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:16px 14px;display:flex;flex-direction:column;gap:10px;animation:flpop 3.6s ease-in-out infinite;animation-delay:var(--d)}
-.ld-flow li:not(:last-child)::after{content:'';position:absolute;top:44px;right:-15px;width:16px;height:4px;border-radius:4px;background:repeating-linear-gradient(90deg,var(--water) 0 5px,transparent 5px 9px);background-size:18px 4px;animation:flmove .8s linear infinite;z-index:1}
+.ld-flow h2{font-size:clamp(20px,3.4vw,26px);margin:0 0 10px;letter-spacing:-.5px}
+.ld-flow ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ld-flow li{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:10px 12px;display:flex;align-items:center;gap:10px;animation:flpop 3.6s ease-in-out infinite;animation-delay:var(--d)}
+.ld-flow li:not(:last-child)::after{content:'';position:absolute;top:50%;right:-11px;width:10px;height:4px;margin-top:-2px;border-radius:4px;background:repeating-linear-gradient(90deg,var(--water) 0 4px,transparent 4px 7px);background-size:14px 4px;animation:flmove .8s linear infinite;z-index:1}
 .ld-flow li:last-child{background:color-mix(in srgb,var(--water) 22%,var(--surface));border-color:var(--water)}
-.fl-ic{position:relative;width:56px;height:56px;border-radius:18px;display:grid;place-items:center;background:color-mix(in srgb,var(--primary) 12%,var(--surface))}
-.fl-ic i{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:var(--primary);color:var(--on-primary,#fff);font-style:normal;font-weight:900;font-size:13px;display:grid;place-items:center}
-.ld-flow b{font-size:17px}.ld-flow p{margin:2px 0 0;font-weight:800;font-size:15px}.ld-flow small{display:block;margin-top:4px;font-weight:700;color:var(--muted);font-size:13px;line-height:1.35}
-@keyframes flpop{0%,20%,100%{transform:none;box-shadow:none}8%{transform:translateY(-6px);box-shadow:0 10px 0 -4px color-mix(in srgb,var(--water) 45%,transparent)}}
-@keyframes flmove{to{background-position:18px 0}}
-@media (max-width:760px){.ld-flow ol{grid-template-columns:1fr;gap:16px}.ld-flow li{flex-direction:row;align-items:center}.ld-flow li:not(:last-child)::after{top:auto;bottom:-14px;right:auto;left:40px;width:4px;height:14px;background:repeating-linear-gradient(180deg,var(--water) 0 5px,transparent 5px 9px);background-size:4px 18px;animation-name:flmovev}.fl-ic{flex:none}}
-@keyframes flmovev{to{background-position:0 18px}}
+.fl-ic{position:relative;flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--primary) 12%,var(--surface))}
+.fl-ic svg{width:22px;height:22px}
+.fl-ic i{position:absolute;top:-6px;left:-6px;width:18px;height:18px;border-radius:50%;background:var(--primary);color:var(--on-primary,#fff);font-style:normal;font-weight:900;font-size:11px;display:grid;place-items:center}
+.ld-flow b{font-size:14px;display:block;line-height:1.2}.ld-flow p{margin:1px 0 0;font-weight:700;font-size:13px;color:var(--muted);line-height:1.25}
+@keyframes flpop{0%,20%,100%{transform:none}8%{transform:translateY(-4px)}}
+@keyframes flmove{to{background-position:14px 0}}
+@media (max-width:760px){.ld-flow ol{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ld-flow li::after{display:none}.ld-flow li{padding:9px 10px}}
 @media (prefers-reduced-motion:reduce){.ld-flow li,.ld-flow li::after{animation:none}}
 .ld-roles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .ld-role{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;transition:transform .2s}
@@ -1033,7 +1034,7 @@ function renderLogin(){const el=document.getElementById('login');document.body.c
  ['home','Familia o maestro','Confirman que sí pasó.','En casa, la familia · en el colegio, su maestro'],
  ['shield','Coordinación','Revisa y lo autoriza.','Cuida que todo sea real y seguro'],
  ['drop','Manantial','¡Cae la gota!','+20 gotas para todo el colegio']
-].map(([i,t,d,e],k)=>`<li style="--d:${k*0.9}s"><span class="fl-ic">${i==='drop'?drop(30,'var(--water)'):ic(i,28,'var(--primary)')}<i>${k+1}</i></span><div><b>${t}</b><p>${d}</p><small>${e}</small></div></li>`).join('')}</ol></section>
+].map(([i,t,d,e],k)=>`<li style="--d:${k*0.9}s"><span class="fl-ic">${i==='drop'?drop(30,'var(--water)'):ic(i,28,'var(--primary)')}<i>${k+1}</i></span><div><b>${t}</b><p>${d}</p></div></li>`).join('')}</ol></section>
  <section class="ld-marquee" aria-label="Retos de temporada todo el año"><div class="ld-track">${[...uniqFest(),...uniqFest()].map(f=>`<span style="--fc:${f.c}">${ic('spark',14,'#FFFFFF')} ${f.n}</span>`).join('')}</div></section>
  <p class="ld-priv">${ic('shield',18,'var(--primary)')} La familia decide qué se comparte y todo lo revisa el colegio.</p>
  <section class="ld-sec" id="registro"><form class="card stack ld-form" id="freg"><h2>Crea tu cuenta</h2><p class="muted" style="font-weight:700">Súmate en un minuto.</p>
